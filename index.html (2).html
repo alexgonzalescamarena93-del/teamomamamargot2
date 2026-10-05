@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Atrapa el Amor para Mamá</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@400;600;800&display=swap');
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; overflow: hidden; }
+body { font-family: 'Poppins', sans-serif; background: linear-gradient(135deg, #fce4ec 0%, #f8bbd0 100%); display: flex; justify-content: center; align-items: center; padding: 5px; }
+#contenedor { width: 100%; max-width: 700px; height: 100vh; max-height: 100vh; background: white; overflow: hidden; border-radius: 15px; border: 3px solid #f06292; box-shadow: 0 10px 25px rgba(0,0,0,0.2); position: relative; }
+
+.pantalla { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #fff 0%, #fce4ec 100%); display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 15px; overflow-y: auto; }
+.oculto { display: none !important; }
+
+#menu h1 { font-family: 'Dancing Script', cursive; font-size: 2.5rem; color: #d81b60; text-align: center; margin-bottom: 15px; }
+#monedas { background: #fff3e0; border: 3px solid #ffb74d; color: #e65100; padding: 8px 20px; border-radius: 30px; font-weight: 800; font-size: 1.1rem; margin-bottom: 15px; }
+.instrucciones { background: #fce4ec; padding: 10px 15px; border-radius: 15px; margin-bottom: 15px; border-left: 5px solid #f06292; font-size: 0.8rem; max-width: 95%; }
+.instrucciones li { margin-bottom: 4px; color: #555; margin-left: 18px; }
+.botones-menu { display: flex; flex-direction: column; gap: 12px; width: 85%; max-width: 300px; }
+.btn { background: #e91e63; color: white; border: none; padding: 16px 20px; font-size: 1.05rem; border-radius: 50px; cursor: pointer; font-family: inherit; font-weight: 700; box-shadow: 0 5px 15px rgba(233,30,99,0.4); transition: all 0.15s; width: 100%; }
+.btn:active { transform: scale(0.97); }
+.btn-naranja { background: #ff9800; }
+.btn-gris { background: #9e9e9e; }
+
+#tienda h2 { font-family: 'Dancing Script', cursive; font-size: 2.2rem; color: #d81b60; margin-bottom: 12px; }
+#tienda-monedas { background: #fff3e0; border: 3px solid #ffb74d; color: #e65100; padding: 6px 18px; border-radius: 30px; font-weight: 800; font-size: 1rem; margin-bottom: 15px; }
+#grid-skins { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; width: 100%; max-width: 500px; margin-bottom: 15px; }
+.tarjeta-skin { background: white; border-radius: 10px; padding: 8px 4px; display: flex; flex-direction: column; align-items: center; box-shadow: 0 3px 8px rgba(0,0,0,0.1); border: 2px solid #eee; }
+.tarjeta-skin.comprada { border-color: #f06292; }
+.tarjeta-skin.equipada { border-color: #4caf50; background: #e8f5e9; }
+.skin-preview { width: 40px; height: 40px; background-size: contain; background-repeat: no-repeat; background-position: center; margin-bottom: 4px; }
+.skin-nombre { font-size: 0.65rem; font-weight: 700; color: #333; margin-bottom: 2px; text-align: center; }
+.skin-precio { font-size: 0.65rem; font-weight: 800; color: #e65100; margin-bottom: 4px; }
+.skin-precio.gratis { color: #4caf50; }
+.skin-btn { padding: 5px 8px; font-size: 0.65rem; border-radius: 8px; border: none; cursor: pointer; font-weight: 700; font-family: inherit; color: white; }
+.btn-comprar { background: #ff9800; }
+.btn-comprar:disabled { background: #ccc; cursor: not-allowed; }
+.btn-equipar { background: #4caf50; }
+.btn-equipada { background: #e0e0e0; color: #666; }
+
+#juego { padding: 0; justify-content: flex-start; background: white; }
+#header { width: 100%; padding: 8px 10px; background: #f06292; color: white; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
+#header h1 { font-family: 'Dancing Script', cursive; font-size: 1.1rem; }
+#stats { display: flex; gap: 6px; font-size: 0.65rem; font-weight: 700; background: rgba(0,0,0,0.2); padding: 4px 8px; border-radius: 15px; }
+#btn-menu { background: rgba(255,255,255,0.3); border: 2px solid white; color: white; padding: 4px 10px; border-radius: 15px; cursor: pointer; font-weight: 700; font-size: 0.65rem; font-family: inherit; }
+
+#area { position: relative; width: 100%; flex: 1; overflow: hidden; background: radial-gradient(circle at center, #fff 0%, #fce4ec 100%); touch-action: none; min-height: 0; }
+
+#jugador { position: absolute; width: 70px; height: 70px; background-size: contain; background-repeat: no-repeat; background-position: center; z-index: 5; pointer-events: none; }
+
+/* BOTONES TÁCTILES GRANDES */
+#controles-tactiles { position: absolute; bottom: 15px; left: 0; width: 100%; display: flex; justify-content: space-between; padding: 0 15px; z-index: 20; pointer-events: none; }
+.boton-tactil { width: 75px; height: 75px; background: rgba(233,30,99,0.7); border: 3px solid white; border-radius: 50%; display: flex; justify-content: center; align-items: center; color: white; font-size: 2rem; font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.3); pointer-events: auto; user-select: none; }
+.boton-tactil:active { background: rgba(233,30,99,1); transform: scale(0.95); }
+
+.skin-classic { background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23e91e63"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>'); }
+.skin-gold { background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23ffd700"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>'); }
+.skin-crystal { background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%2300bfff"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>'); }
+.skin-fire { background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23ff4500"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>'); }
+.skin-emerald { background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%2300c853"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>'); }
+.skin-purple { background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%239c27b0"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>'); }
+.skin-rainbow { background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><defs><linearGradient id="rb" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="%23ff0000"/><stop offset="50%" stop-color="%23ffeb3b"/><stop offset="100%" stop-color="%232196f3"/></linearGradient></defs><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="url(%23rb)"/></svg>'); }
+.skin-diamond { background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23b2ebf2"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>'); }
+.skin-shadow { background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23303336"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>'); }
+
+.corazon { position: absolute; width: 40px; height: 40px; background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23ff4081"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>') no-repeat center center; background-size: contain; z-index: 4; }
+.jefe { position: absolute; z-index: 6; display: flex; justify-content: center; align-items: center; font-weight: 800; font-size: 1.5rem; color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); }
+.jefe-oro { width: 90px; height: 90px; background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23ffd700"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>') no-repeat center center; background-size: contain; }
+.jefe-fuego { width: 100px; height: 100px; background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23ff4500"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>') no-repeat center center; background-size: contain; }
+.jefe-cristal { width: 110px; height: 110px; background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%2300bfff"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>') no-repeat center center; background-size: contain; }
+.barra-vida { position: absolute; top: -12px; width: 100%; height: 6px; background: rgba(0,0,0,0.5); border-radius: 3px; overflow: hidden; }
+.barra-vida-fill { height: 100%; background: #ff4081; width: 100%; transition: width 0.2s; }
+.estrella { position: absolute; width: 12px; height: 12px; background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23ffd54f"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>') no-repeat center center; background-size: contain; opacity: 0.4; z-index: 1; }
+.mensaje-flotante { position: absolute; color: #d81b60; font-weight: 800; font-size: 1rem; pointer-events: none; animation: subir 1.5s ease-out forwards; z-index: 10; text-shadow: 2px 2px 4px white; }
+@keyframes subir { to { opacity: 0; transform: translateY(-80px) scale(1.4); } }
+
+#overlay-nivel { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.97); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 50; padding: 15px; text-align: center; }
+#overlay-nivel h2 { font-family: 'Dancing Script', cursive; font-size: 2.2rem; color: #d81b60; margin-bottom: 8px; }
+#overlay-nivel img { width: 75%; max-width: 250px; border-radius: 12px; border: 3px solid #f06292; margin: 8px 0; max-height: 180px; object-fit: cover; }
+#overlay-nivel p { color: #555; margin: 4px 0; font-size: 0.9rem; }
+
+#fin h2 { font-family: 'Dancing Script', cursive; font-size: 2.5rem; color: #d81b60; margin-bottom: 12px; text-align: center; }
+#fin p { color: #555; text-align: center; margin-bottom: 12px; font-size: 0.95rem; }
+#monedas-ganadas { color: #e65100 !important; font-weight: 800; font-size: 1.05rem; background: #fff3e0; padding: 8px 18px; border-radius: 20px; border: 2px solid #ffb74d; }
+#fin .btn { max-width: 280px; margin-bottom: 8px; }
+</style>
+</head>
+<body>
+
+<div id="contenedor">
+
+    <div id="menu" class="pantalla">
+        <h1>Para la mejor Mamá</h1>
+        <div id="monedas">🪙 <span id="coin-count">0</span> Monedas</div>
+        <div class="instrucciones">
+            <ul>
+                <li>Toca los botones ← → o desliza el dedo para mover a Mamá.</li>
+                <li>Atrapa corazones rosados para ganar puntos.</li>
+                <li>Los puntos se acumulan como monedas.</li>
+                <li>Derrota a los Jefes cada 3 niveles.</li>
+            </ul>
+        </div>
+        <div class="botones-menu">
+            <button class="btn" id="btn-jugar">▶ Jugar</button>
+            <button class="btn btn-naranja" id="btn-tienda">🛍️ Tienda de Skins</button>
+        </div>
+    </div>
+
+    <div id="tienda" class="pantalla oculto">
+        <h2>Tienda de Skins</h2>
+        <div id="tienda-monedas">🪙 <span id="shop-coin-count">0</span> Monedas disponibles</div>
+        <div id="grid-skins"></div>
+        <button class="btn btn-gris" id="btn-volver" style="max-width: 280px;">← Volver al Menú</button>
+    </div>
+
+    <div id="juego" class="pantalla oculto">
+        <div id="header">
+            <h1>Te Amo Mamá</h1>
+            <div id="stats">
+                <span>Nv: <span id="nivel">1</span></span>
+                <span>Pts: <span id="puntos">0</span></span>
+                <span>T: <span id="tiempo">60</span>s</span>
+            </div>
+            <button id="btn-menu">Menú</button>
+        </div>
+        <div id="area">
+            <div id="jugador" class="skin-classic"></div>
+            <div id="controles-tactiles">
+                <div class="boton-tactil" id="btn-izq">←</div>
+                <div class="boton-tactil" id="btn-der">→</div>
+            </div>
+            <div id="overlay-nivel" class="oculto">
+                <h2 id="nivel-titulo">¡Nivel 2!</h2>
+                <img id="nivel-imagen" src="" alt="">
+                <p id="nivel-subtitulo"></p>
+                <p id="nivel-mensaje"></p>
+            </div>
+        </div>
+    </div>
+
+    <div id="fin" class="pantalla oculto">
+        <h2>¡Lo lograste!</h2>
+        <p id="mensaje-final"></p>
+        <p id="monedas-ganadas"></p>
+        <button class="btn" id="btn-reiniciar">Jugar de nuevo</button>
+        <button class="btn btn-gris" id="btn-menu-fin">Volver al Menú</button>
+    </div>
+
+</div>
+
+<script>
+var SKINS = [
+    { id: 'skin-classic', name: 'Clásico',   price: 0 },
+    { id: 'skin-gold',    name: 'Dorado',    price: 0 },
+    { id: 'skin-crystal', name: 'Cristal',   price: 0 },
+    { id: 'skin-fire',    name: 'Fuego',     price: 0 },
+    { id: 'skin-emerald', name: 'Esmeralda', price: 100 },
+    { id: 'skin-purple',  name: 'Púrpura',   price: 200 },
+    { id: 'skin-rainbow', name: 'Arcoíris',  price: 350 },
+    { id: 'skin-diamond', name: 'Diamante',  price: 500 },
+    { id: 'skin-shadow',  name: 'Sombra',    price: 750 }
+];
+
+var IMAGENES = [
+    "https://i.postimg.cc/XGPRB8Vm/foto1.jpg",
+    "https://i.postimg.cc/hQ7HLdjw/foto2.jpg",
+    "https://i.postimg.cc/QKWRQTtY/foto3.jpg",
+    "https://i.postimg.cc/hQ7HLdj5/foto4.jpg"
+];
+
+var FRASES = ["¡Te amo!","Gracias, Mamá","Eres la mejor","¡Un abrazo!","¡Eres increíble!","¡Gracias por todo!","¡Eres mi héroe!","¡Te quiero mucho!","¡Eres única!","¡Gracias por existir!"];
+
+var totalMonedas = 200;
+var skinsCompradas = ['skin-classic', 'skin-gold', 'skin-crystal', 'skin-fire'];
+var skinEquipada = 'skin-classic';
+var puntos = 0, nivel = 1, tiempo = 60;
+var jugando = false, pausado = false;
+var intervaloJuego = null, intervaloSpawn = null, intervaloTiempo = null;
+var jugadorX = 0, jugadorY = 0, objetivoX = 0, objetivoY = 0;
+var jefeActivo = false, jefeElemento = null, jefeVida = 0, jefeVidaMax = 0, jefeTipo = '', jefeVelocidad = 0;
+
+var pantallaMenu = document.getElementById('menu');
+var pantallaTienda = document.getElementById('tienda');
+var pantallaJuego = document.getElementById('juego');
+var pantallaFin = document.getElementById('fin');
+var btnJugar = document.getElementById('btn-jugar');
+var btnTienda = document.getElementById('btn-tienda');
+var btnVolver = document.getElementById('btn-volver');
+var btnReiniciar = document.getElementById('btn-reiniciar');
+var btnMenu = document.getElementById('btn-menu');
+var btnMenuFin = document.getElementById('btn-menu-fin');
+var area = document.getElementById('area');
+var jugador = document.getElementById('jugador');
+var spanNivel = document.getElementById('nivel');
+var spanPuntos = document.getElementById('puntos');
+var spanTiempo = document.getElementById('tiempo');
+var spanCoin = document.getElementById('coin-count');
+var spanShopCoin = document.getElementById('shop-coin-count');
+var gridSkins = document.getElementById('grid-skins');
+var mensajeFinal = document.getElementById('mensaje-final');
+var monedasGanadas = document.getElementById('monedas-ganadas');
+var overlayNivel = document.getElementById('overlay-nivel');
+var nivelTitulo = document.getElementById('nivel-titulo');
+var nivelImagen = document.getElementById('nivel-imagen');
+var nivelSubtitulo = document.getElementById('nivel-subtitulo');
+var nivelMensaje = document.getElementById('nivel-mensaje');
+
+function mostrarPantalla(p) {
+    pantallaMenu.classList.add('oculto');
+    pantallaTienda.classList.add('oculto');
+    pantallaJuego.classList.add('oculto');
+    pantallaFin.classList.add('oculto');
+    p.classList.remove('oculto');
+}
+
+function actualizarMonedasUI() {
+    spanCoin.textContent = totalMonedas;
+    spanShopCoin.textContent = totalMonedas;
+}
+
+function renderizarTienda() {
+    actualizarMonedasUI();
+    gridSkins.innerHTML = '';
+    for (var i = 0; i < SKINS.length; i++) {
+        var skin = SKINS[i];
+        var comprada = skinsCompradas.indexOf(skin.id) !== -1;
+        var equipada = skinEquipada === skin.id;
+        var puede = totalMonedas >= skin.price;
+        var t = document.createElement('div');
+        t.className = 'tarjeta-skin';
+        if (comprada) t.classList.add('comprada');
+        if (equipada) t.classList.add('equipada');
+        t.innerHTML = '<div class="skin-preview ' + skin.id + '"></div><div class="skin-nombre">' + skin.name + '</div>';
+        if (!comprada) {
+            var pr = document.createElement('div');
+            pr.className = 'skin-precio' + (skin.price === 0 ? ' gratis' : '');
+            pr.textContent = skin.price === 0 ? 'GRATIS' : skin.price + ' 🪙';
+            t.appendChild(pr);
+        }
+        var b = document.createElement('button');
+        b.className = 'skin-btn';
+        if (equipada) { b.textContent = '✓ Equipada'; b.classList.add('btn-equipada'); b.disabled = true; }
+        else if (comprada) { b.textContent = 'Equipar'; b.classList.add('btn-equipar'); b.setAttribute('data-skin', skin.id); b.setAttribute('data-accion', 'equipar'); }
+        else { b.textContent = skin.price === 0 ? 'Obtener' : 'Comprar'; b.classList.add('btn-comprar'); b.disabled = !puede; b.setAttribute('data-skin', skin.id); b.setAttribute('data-accion', 'comprar'); }
+        t.appendChild(b);
+        gridSkins.appendChild(t);
+    }
+    var botones = gridSkins.querySelectorAll('.skin-btn');
+    for (var j = 0; j < botones.length; j++) botones[j].addEventListener('click', manejarBotonSkin);
+}
+
+function manejarBotonSkin(e) {
+    var b = e.currentTarget;
+    var id = b.getAttribute('data-skin');
+    var acc = b.getAttribute('data-accion');
+    if (acc === 'comprar') comprarSkin(id);
+    else if (acc === 'equipar') equiparSkin(id);
+}
+
+function comprarSkin(id) {
+    var s = null;
+    for (var i = 0; i < SKINS.length; i++) if (SKINS[i].id === id) { s = SKINS[i]; break; }
+    if (!s) return;
+    if (totalMonedas >= s.price) {
+        totalMonedas -= s.price;
+        skinsCompradas.push(id);
+        skinEquipada = id;
+        renderizarTienda();
+    }
+}
+
+function equiparSkin(id) {
+    skinEquipada = id;
+    renderizarTienda();
+}
+
+function iniciarJuego() {
+    puntos = 0; nivel = 1; tiempo = 60; jefeActivo = false;
+    if (jefeElemento) { jefeElemento.remove(); jefeElemento = null; }
+    actualizarUI();
+    jugando = true; pausado = false;
+    mostrarPantalla(pantallaJuego);
+    var els = area.querySelectorAll('.corazon, .mensaje-flotante, .estrella');
+    for (var i = 0; i < els.length; i++) els[i].remove();
+    overlayNivel.classList.add('oculto');
+    jugador.className = skinEquipada;
+    var aw = area.clientWidth, ah = area.clientHeight;
+    jugadorX = aw/2 - 35;
+    jugadorY = ah - 120;
+    objetivoX = jugadorX;
+    objetivoY = jugadorY;
+    jugador.style.left = jugadorX + 'px';
+    jugador.style.top = jugadorY + 'px';
+    for (var j = 0; j < 15; j++) {
+        var e = document.createElement('div');
+        e.className = 'estrella';
+        e.style.left = Math.random()*100 + '%';
+        e.style.top = Math.random()*80 + '%';
+        area.appendChild(e);
+    }
+    intervaloJuego = setInterval(actualizarJuego, 16);
+    intervaloSpawn = setInterval(generarCorazon, 1000);
+    intervaloTiempo = setInterval(function() {
+        if (!pausado && jugando) {
+            tiempo--;
+            spanTiempo.textContent = tiempo;
+            if (tiempo <= 0) terminarJuego();
+        }
+    }, 1000);
+}
+
+function actualizarUI() {
+    spanPuntos.textContent = puntos;
+    spanNivel.textContent = nivel;
+    spanTiempo.textContent = tiempo;
+}
+
+function generarCorazon() {
+    if (!jugando || pausado || jefeActivo) return;
+    if (nivel % 3 === 0 && puntos % 10 === 8 && puntos > 0) { generarJefe(); return; }
+    var c = document.createElement('div');
+    c.className = 'corazon';
+    c.style.left = Math.random() * (area.clientWidth - 40) + 'px';
+    c.style.top = '-40px';
+    c.setAttribute('data-velocidad', 2 + (nivel * 0.8) + (Math.random() * 1.5));
+    area.appendChild(c);
+}
+
+function generarJefe() {
+    jefeActivo = true;
+    if (nivel <= 3) { jefeTipo = 'oro'; jefeVidaMax = 3; jefeVelocidad = 1.5; jefeElemento = document.createElement('div'); jefeElemento.className = 'jefe jefe-oro'; }
+    else if (nivel <= 6) { jefeTipo = 'fuego'; jefeVidaMax = 5; jefeVelocidad = 2.5; jefeElemento = document.createElement('div'); jefeElemento.className = 'jefe jefe-fuego'; }
+    else { jefeTipo = 'cristal'; jefeVidaMax = 8; jefeVelocidad = 1.0; jefeElemento = document.createElement('div'); jefeElemento.className = 'jefe jefe-cristal'; }
+    jefeVida = jefeVidaMax;
+    jefeElemento.textContent = jefeVida;
+    var barra = document.createElement('div'); barra.className = 'barra-vida';
+    var relleno = document.createElement('div'); relleno.className = 'barra-vida-fill';
+    barra.appendChild(relleno); jefeElemento.appendChild(barra);
+    jefeElemento.style.left = Math.random() * (area.clientWidth - 110) + 'px';
+    jefeElemento.style.top = '-110px';
+    jefeElemento.setAttribute('data-velocidad', jefeVelocidad);
+    area.appendChild(jefeElemento);
+}
+
+function actualizarJuego() {
+    if (!jugando || pausado) return;
+    var aw = area.clientWidth, ah = area.clientHeight;
+    jugadorX += (objetivoX - jugadorX) * 0.25;
+    jugadorY += (objetivoY - jugadorY) * 0.25;
+    jugadorX = Math.max(0, Math.min(aw - 70, jugadorX));
+    jugadorY = Math.max(0, Math.min(ah - 70, jugadorY));
+    jugador.style.left = jugadorX + 'px';
+    jugador.style.top = jugadorY + 'px';
+    var rj = jugador.getBoundingClientRect();
+    var ra = area.getBoundingClientRect();
+    var hb = { left: rj.left + 12, right: rj.right - 12, top: rj.top + 12, bottom: rj.bottom - 12 };
+    var cs = area.querySelectorAll('.corazon');
+    for (var i = 0; i < cs.length; i++) {
+        var c = cs[i];
+        var rc = c.getBoundingClientRect();
+        var top = parseFloat(c.style.top) || -40;
+        top += parseFloat(c.getAttribute('data-velocidad')) || 2;
+        c.style.top = top + 'px';
+        if (rc.left < hb.right && rc.right > hb.left && rc.top < hb.bottom && rc.bottom > hb.top) {
+            puntos++; actualizarUI();
+            mostrarMensaje(rc.left - ra.left, rc.top - ra.top);
+            c.remove();
+            verificarNivel();
+        } else if (top > ah) c.remove();
+    }
+    if (jefeActivo && jefeElemento) {
+        var rjj = jefeElemento.getBoundingClientRect();
+        var tj = parseFloat(jefeElemento.style.top) || -110;
+        tj += parseFloat(jefeElemento.getAttribute('data-velocidad')) || 2;
+        jefeElemento.style.top = tj + 'px';
+        if (jefeTipo === 'fuego') {
+            var lj = parseFloat(jefeElemento.style.left);
+            lj += Math.sin(Date.now()/200) * 3;
+            jefeElemento.style.left = lj + 'px';
+        }
+        if (rjj.left < hb.right && rjj.right > hb.left && rjj.top < hb.bottom && rjj.bottom > hb.top) {
+            jefeVida--;
+            var relleno = jefeElemento.querySelector('.barra-vida-fill');
+            if (relleno) relleno.style.width = (jefeVida / jefeVidaMax * 100) + '%';
+            if (jefeVida <= 0) {
+                puntos += 20; actualizarUI();
+                mostrarMensaje(rjj.left - ra.left, rjj.top - ra.top, "¡Jefe Derrotado! +20");
+                jefeElemento.remove(); jefeElemento = null; jefeActivo = false;
+                mostrarImagenNivel(true);
+                clearInterval(intervaloSpawn);
+                intervaloSpawn = setInterval(generarCorazon, Math.max(300, 1000 - nivel*100));
+            } else {
+                jefeElemento.textContent = jefeVida;
+                var bar2 = document.createElement('div'); bar2.className = 'barra-vida';
+                var nr = document.createElement('div'); nr.className = 'barra-vida-fill';
+                nr.style.width = (jefeVida / jefeVidaMax * 100) + '%';
+                bar2.appendChild(nr); jefeElemento.appendChild(bar2);
+                tj -= 40; jefeElemento.style.top = tj + 'px';
+            }
+        } else if (tj > ah) { jefeElemento.remove(); jefeElemento = null; jefeActivo = false; }
+    }
+}
+
+function mostrarMensaje(x, y, txt) {
+    var m = document.createElement('div');
+    m.className = 'mensaje-flotante';
+    m.textContent = txt || FRASES[Math.floor(Math.random()*FRASES.length)];
+    m.style.left = x + 'px'; m.style.top = y + 'px';
+    area.appendChild(m);
+    setTimeout(function() { m.remove(); }, 1500);
+}
+
+function verificarNivel() {
+    var nn = Math.floor(puntos / 10) + 1;
+    if (nn > nivel) {
+        nivel = nn; actualizarUI();
+        clearInterval(intervaloSpawn);
+        intervaloSpawn = setInterval(generarCorazon, Math.max(300, 1000 - nivel*100));
+        mostrarImagenNivel(false);
+    }
+}
+
+function mostrarImagenNivel(esJefe) {
+    pausado = true;
+    nivelImagen.src = IMAGENES[(nivel - 1) % IMAGENES.length];
+    if (esJefe) {
+        nivelTitulo.textContent = "¡JEFE DERROTADO!";
+        nivelSubtitulo.textContent = "Has vencido a un enemigo.";
+        nivelMensaje.textContent = "¡Eres increíble, Mamá!";
+    } else {
+        nivelTitulo.textContent = "¡Nivel " + nivel + "!";
+        nivelSubtitulo.textContent = "Has atrapado " + puntos + " corazones.";
+        nivelMensaje.textContent = FRASES[Math.floor(Math.random()*FRASES.length)];
+    }
+    overlayNivel.classList.remove('oculto');
+    setTimeout(function() { overlayNivel.classList.add('oculto'); pausado = false; }, 2500);
+}
+
+function terminarJuego() {
+    jugando = false;
+    clearInterval(intervaloJuego); clearInterval(intervaloSpawn); clearInterval(intervaloTiempo);
+    totalMonedas += puntos;
+    if (puntos >= 50) mensajeFinal.textContent = "¡Increíble! Atrapaste " + puntos + " corazones. ¡Eres la mejor mamá del mundo!";
+    else if (puntos >= 25) mensajeFinal.textContent = "¡Muy bien! Atrapaste " + puntos + " corazones. ¡Gracias por tanto amor!";
+    else mensajeFinal.textContent = "Atrapaste " + puntos + " corazones. ¡Siempre te amaremos!";
+    monedasGanadas.textContent = "+" + puntos + " 🪙 para la tienda";
+    mostrarPantalla(pantallaFin);
+}
+
+// ===== CONTROLES TÁCTILES CON BOTONES =====
+var botonIzq = document.getElementById('btn-izq');
+var botonDer = document.getElementById('btn-der');
+var manteniendoIzq = false;
+var manteniendoDer = false;
+
+function moverIzquierda() {
+    if (!jugando || pausado) return;
+    objetivoX = Math.max(0, objetivoX - 25);
+}
+
+function moverDerecha() {
+    if (!jugando || pausado) return;
+    objetivoX = Math.min(area.clientWidth - 70, objetivoX + 25);
+}
+
+// Eventos para botón izquierdo
+botonIzq.addEventListener('touchstart', function(e) { e.preventDefault(); manteniendoIzq = true; moverIzquierda(); });
+botonIzq.addEventListener('touchend', function(e) { e.preventDefault(); manteniendoIzq = false; });
+botonIzq.addEventListener('mousedown', function() { manteniendoIzq = true; moverIzquierda(); });
+botonIzq.addEventListener('mouseup', function() { manteniendoIzq = false; });
+botonIzq.addEventListener('mouseleave', function() { manteniendoIzq = false; });
+
+// Eventos para botón derecho
+botonDer.addEventListener('touchstart', function(e) { e.preventDefault(); manteniendoDer = true; moverDerecha(); });
+botonDer.addEventListener('touchend', function(e) { e.preventDefault(); manteniendoDer = false; });
+botonDer.addEventListener('mousedown', function() { manteniendoDer = true; moverDerecha(); });
+botonDer.addEventListener('mouseup', function() { manteniendoDer = false; });
+botonDer.addEventListener('mouseleave', function() { manteniendoDer = false; });
+
+// Loop para mantener presionado
+setInterval(function() {
+    if (manteniendoIzq) moverIzquierda();
+    if (manteniendoDer) moverDerecha();
+}, 100);
+
+// También permitir arrastrar el dedo por el área
+area.addEventListener('touchmove', function(e) {
+    if (!jugando || pausado) return;
+    e.preventDefault();
+    var rect = area.getBoundingClientRect();
+    var t = e.touches[0];
+    objetivoX = t.clientX - rect.left - 35;
+    objetivoY = t.clientY - rect.top - 35;
+}, { passive: false });
+
+area.addEventListener('mousemove', function(e) {
+    if (!jugando || pausado) return;
+    var rect = area.getBoundingClientRect();
+    objetivoX = e.clientX - rect.left - 35;
+    objetivoY = e.clientY - rect.top - 35;
+});
+
+btnJugar.addEventListener('click', iniciarJuego);
+btnTienda.addEventListener('click', function() { mostrarPantalla(pantallaTienda); renderizarTienda(); });
+btnVolver.addEventListener('click', function() { mostrarPantalla(pantallaMenu); actualizarMonedasUI(); });
+btnReiniciar.addEventListener('click', iniciarJuego);
+btnMenu.addEventListener('click', function() {
+    jugando = false; pausado = false;
+    clearInterval(intervaloJuego); clearInterval(intervaloSpawn); clearInterval(intervaloTiempo);
+    if (jefeElemento) { jefeElemento.remove(); jefeElemento = null; }
+    jefeActivo = false;
+    if (puntos > 0) { totalMonedas += puntos; puntos = 0; }
+    mostrarPantalla(pantallaMenu);
+    actualizarMonedasUI();
+});
+btnMenuFin.addEventListener('click', function() { mostrarPantalla(pantallaMenu); actualizarMonedasUI(); });
+
+actualizarMonedasUI();
+jugador.className = skinEquipada;
+console.log('Juego cargado - versión móvil');
+</script>
+</body>
+</html>
